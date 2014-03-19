@@ -35,3 +35,15 @@
   - cloud-cert.pem
   - cloud-pk.pem
   - euca.p12
+
+# Install eucalyptus-console
+- name: Install the release console package
+  action: yum name=eucalyptus-console state=latest
+
+# Start the console service
+- name: Restart console
+  action: service name=eucalyptus-console state=restarted
+
+# Wait for console service to come up
+- name: Waiting for console service
+  action: wait_for port=8888 delay=15
