@@ -40,7 +40,8 @@
   - node-pk.pem
 
 - name: Wait for Walrus and his bukkitz
-  action: wait_for host=${hostvars.{$item}.ansible_$vnet_pub.ipv4.address} port=8773 delay=10 timeout=300
+  #action: wait_for host=${hostvars.{$item}.ansible_$vnet_pub.ipv4.address} port=8773 delay=10 timeout=300
+  action: wait_for host={{ hostvars.{{ item }}.ansible_{{ vnet_pub }}.ipv4.address }} port=8773 delay=10 timeout=300
   with_items: groups.walrus
 
 - name: Install ELB utils
@@ -93,4 +94,7 @@
   action: command /usr/bin/unzip -qou /root/admin.zip -d /root/admin-creds creates=/root/admin-creds/eucarc
   tags:
   - creds
+
+- name: Download/install CentOS 6.4 image
+  action: command eustore-install-image -i 3471904862 -b testbucket -k kvm
 
