@@ -29,7 +29,7 @@ deprecation_warnings=False
 
 IMPORTANT NOTE:  Due to some legacy syntax this playbook does not work with 1.6-devel (i.e. from checkout).
 
-You will definately need this too, for now:
+You will definitely need this too, for now:
 
 error_on_undefined_vars = False
 
