@@ -36,3 +36,6 @@ error_on_undefined_vars = False
 You might also want to consider (if you rebuild a lot) disabling host key checking by enabling the line:
 
 host_key_checking = False
+
+The file ansible.cfg in the current directory has been provided for this purpose, and should automatically be read
+when you execute ansible-playbook. If you do not wish to use this file, rename it or comment out the lines in the file.
