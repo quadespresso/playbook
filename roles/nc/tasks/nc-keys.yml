@@ -1,3 +1,4 @@
+---
 - name: Copy keys to NCs 
   action: copy src=/tmp/{{ item }} dest=/var/lib/eucalyptus/keys/ owner=eucalyptus group=eucalyptus mode=0700
   with_items:

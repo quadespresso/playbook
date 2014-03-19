@@ -1,3 +1,4 @@
+---
 # Playbook for the cloud deployment. Ordering is important as a deployment is sequential. 
 # Variables for the cloud configuration are defined globally in ./vars/main.yml
 
