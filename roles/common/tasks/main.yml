@@ -47,6 +47,7 @@
   shell: /sbin/service eucalyptus-cc status
   register: ccreturn
   ignore_errors: True
+  changed_when: false
 
 - name: Disable firewall (unless its a CC)
   service: name=iptables enabled=no state=stopped

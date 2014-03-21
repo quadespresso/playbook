@@ -5,6 +5,7 @@
   action: shell /usr/sbin/euca_conf --list-walruses | grep -q {{ primary_walrus }}
   register: walrus_return
   ignore_errors: true
+  changed_when: false
 
 - name: Register Walrus
   action: command /usr/sbin/euca_conf --no-scp --no-rsync --no-sync --register-walrus --partition walrus --host {{hostvars.{{item}}.ansible_{vnet_pub}.ipv4.address}} --component walrus-{{hostvars.{{item}}.ansible_hostname}}
@@ -15,6 +16,7 @@
   action: shell /usr/sbin/euca_conf --list-scs | grep -q {{ primary_sc }}
   register: sc_return
   ignore_errors: true
+  changed_when: false
 
 - name: Register SC
   action: command /usr/sbin/euca_conf --no-scp --no-rsync --no-sync --register-sc --partition {{ partition_name }} --host {{hostvars.{{item}}.ansible_{vnet_pub}.ipv4.address}} --component sc-{{hostvars.{{item}}.ansible_hostname}}
@@ -25,6 +27,7 @@
   action: shell /usr/sbin/euca_conf --list-clusters | grep -q {{ primary_cc }}
   register: cc_return
   ignore_errors: true
+  changed_when: false
 
 - name: Register CC
   action: command /usr/sbin/euca_conf --no-scp --no-rsync --no-sync --register-cluster --partition {{ partition_name }} --host {{hostvars.{{item}}.ansible_{vnet_pub}.ipv4.address}} --component cc-{{hostvars.{{item}}.ansible_hostname}}
