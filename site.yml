@@ -2,6 +2,13 @@
 # Playbook for the cloud deployment. Ordering is important as a deployment is sequential. 
 # Variables for the cloud configuration are defined globally in ./vars/main.yml
 
+- hosts: all
+  tags: wait
+  gather_facts: no
+  tasks:
+  - name: Wait for SSH
+    local_action: wait_for port=22 host={% if ansible_ssh_host is defined %}{{ ansible_ssh_host }}{% else %}{{ inventory_hostname }}{% endif %}
+
 - hosts: cc
 
 - hosts: nc
