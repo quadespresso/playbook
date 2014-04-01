@@ -67,8 +67,7 @@
   when: result.changed
 
 - name: Wait for SC
-  wait_for: host={{hostvars.{{item}}.ansible_{{vnet_pub}}.ipv4.address}} port=8773 delay=20
-  with_items: groups.sc[0]
+  wait_for: host={{primary_sc}} port=8773 delay=20
 
 - name: Set block storage manager
   action: shell source /root/admin-creds/eucarc && euca-modify-property -p {{ partition_name }}.storage.blockstoragemanager={{ storbackend }}
