@@ -95,7 +95,13 @@
   tags:
   - creds
 
+- name: checking for the lovely image
+  shell: euca-describe-images | grep -qP "^IMAGE\s+emi-\S+\s+testbucket/euca-centos6.4-ec2user"
+  register: image_present
+  ignore_errors: true
+
 - name: Download/install CentOS 6.4 image
   action: command eustore-install-image -i 3471904862 -b testbucket -k kvm
+  when: image_present|failed
 
 
