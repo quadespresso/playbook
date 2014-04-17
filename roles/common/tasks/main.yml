@@ -1,10 +1,10 @@
 ---
-#  - name: Import RPM keys
-#    action: rpm_key state=present key={{ item }} 
-#    with_items: keys
+# - name: Import RPM keys
+#   action: rpm_key state=present key={{ item }} 
+#   with_items: keys
 
 - name: Template repo files (release)
-  action: template src={{ item }}.j2 dest=/etc/yum.repos.d/{{ item }}
+  template: src={{ item }}.j2 dest=/etc/yum.repos.d/{{ item }}
   with_items:
   - eucalyptus-release.repo
   - euca2ools-release.repo
@@ -13,7 +13,7 @@
   when: not nightlies
 
 - name: Template repo files (nightly)
-  action: template src={{ item }}.j2 dest=/etc/yum.repos.d/{{ item }}
+  template: src={{ item }}.j2 dest=/etc/yum.repos.d/{{ item }}
   with_items:
   - eucalyptus-nightly.repo
   - euca2ools-release.repo
@@ -22,7 +22,7 @@
   when: nightlies
 
 - name: Install packages
-  action: yum name={{ item }} state=installed enablerepo=base,updates
+  yum: name={{ item }} state=installed enablerepo=base,updates
   with_items:
   - libselinux-python
   - tuned
@@ -32,12 +32,12 @@
   - packages
 
 - name: Fix java version
-  action: yum name=http://mirror.centos.org/centos/6.4/updates/x86_64/Packages/java-1.7.0-openjdk-1.7.0.25-2.3.10.4.el6_4.x86_64.rpm state=installed enablerepo=base,updates
+  yum: name=http://mirror.centos.org/centos/6.4/updates/x86_64/Packages/java-1.7.0-openjdk-1.7.0.25-2.3.10.4.el6_4.x86_64.rpm state=installed enablerepo=base,updates
   when: ansible_distribution_version == '6.4'
- 
+
 - name: Ensure SELinux is disabled
   selinux: policy=targeted state=permissive
- 
+
 - name: Turn on NTP and start on boot
   service: name=ntpd enabled=yes state=started
   tags:
@@ -47,7 +47,6 @@
   shell: /sbin/service eucalyptus-cc status
   register: ccreturn
   ignore_errors: True
-  changed_when: false
 
 - name: Disable firewall (unless its a CC)
   service: name=iptables enabled=no state=stopped

@@ -1,41 +1,135 @@
-playbook
+Eucalyptus Playbook
 ========
 
-This is a playbook for deploying Eucalyptus via packages in accordance with reference Architectures. Depends on ansible 1.3 or above.
+This is a playbook for deploying Eucalyptus via packages in accordance with reference Architectures. Depends on ansible 1.3 or above. There are a number of inventory files which aim to mimic the topology of Eucalyptus per the reference architectures found here: http://www.eucalyptus.com/eucalyptus-cloud/reference-architectures/dev-test-large  (minus SAN).
 
-The first playbook "dev-test-large" aims to deploy Eucalyptus in a distributed setup per the reference architecture found here:
+## Configuration
 
-http://www.eucalyptus.com/eucalyptus-cloud/reference-architectures/dev-test-large  (minus SAN).
+Note that variables for the installation should be configured in `vars/main.yml`.  Here you can change the software version, network settings etc.
 
-These are inventory files, you need to subtitutes the example hostnames with your real system hostnames for each component.
+Some variable definitions are deprecated so you might want to set this parameter in your ansible.cfg to remove warnings:
+ 
+`deprecation_warnings = False`
 
-You would then run the playbook with (for example):
+... and due to this legacy syntax this playbook does not work with 1.6-devel (i.e. from checkout). You will definately need this too, for now:
 
-ansible-playbook -i dev-test-large-hosts site.yml -u root -k
-
-Add additional options for sudo, ssh key etc. as required.
-
-playbook configuration
-========
-
-Note that variables for the installation should be configured in vars/main.yml.  Here you can change the software version, network settings etc.
-
-ansible configuration
-========
-
-I've not yet removed all of the deprecated variable definitions, you might want to set this parameter in /etc/ansible/ansible.cfg to remove warnings:
-
-deprecation_warnings=False
-
-IMPORTANT NOTE:  Due to some legacy syntax this playbook does not work with 1.6-devel (i.e. from checkout).
-
-You will definitely need this too, for now:
-
-error_on_undefined_vars = False
+`error_on_undefined_vars = False`
 
 You might also want to consider (if you rebuild a lot) disabling host key checking by enabling the line:
 
-host_key_checking = False
+`host_key_checking = False`
 
-The file ansible.cfg in the current directory has been provided for this purpose, and should automatically be read
-when you execute ansible-playbook. If you do not wish to use this file, rename it or comment out the lines in the file.
+The following sample configuration can be used as a starting point and to keep command-line arguments to a bare minimum:
+
+```bash
+[defaults]
+error_on_undefined_vars = False
+host_key_checking = False
+ask_pass = True
+remote_user = root
+pipelining = True
+hostfile = */path/to/ansible/hostfile*
+```
+
+Recall from the Ansible documentation that the configuration values can be made and used in a configuration file which will be processed in the following order:
+
+* ANSIBLE_CONFIG (an environment variable)
+* ansible.cfg (in the current directory)
+* .ansible.cfg (in the home directory)
+* /etc/ansible/ansible.cfg
+
+## Getting Started
+
+Edit the inventory file template you wish to use.  You'll need to put your host systems into here:
+
+```bash
+[clc]
+myclc.mydomain.com
+
+[walrus]
+mywalrus.mydomain.com
+
+[sc]
+mysc.mydomain.com
+
+[cc]
+mycc.mydomain.com
+
+[nc]
+mynode.mydomain.com
+```
+
+Test by making sure you can reach your hosts, using the ping module.
+
+```bash
+# ansible clc:walrus:sc:cc:nc -m ping
+# ansible cc:nc -m ping
+192.168.249.65 | success >> {
+    "changed": false, 
+    "ping": "pong"
+}
+
+192.168.249.66 | success >> {
+    "changed": false, 
+    "ping": "pong"
+}
+
+192.168.249.18 | success >> {
+    "changed": false, 
+    "ping": "pong"
+}
+
+192.168.249.67 | success >> {
+    "changed": false, 
+    "ping": "pong"
+}
+
+192.168.249.64 | success >> {
+    "changed": false, 
+    "ping": "pong"
+}
+
+192.168.249.69 | success >> {
+    "changed": false, 
+    "ping": "pong"
+}
+
+192.168.249.70 | success >> {
+    "changed": false, 
+    "ping": "pong"
+}
+
+192.168.249.71 | success >> {
+    "changed": false, 
+    "ping": "pong"
+}
+
+192.168.249.68 | success >> {
+    "changed": false, 
+    "ping": "pong"
+}
+```
+
+Now edit vars/main.yml and change your desired variables. You'll definately want to check the version and network parameter variables.  Of particular interest, outside of Eucalyptus' configuration is the bridging section.  The playbooks have only been tested in MANAGED-NOVLAN and, to a lesser extent, MANAGED modes.  As such, you need a bridged interface on your Node Controllers.  This section controls that:
+
+```bash
+bridge: br0
+bridge_iface: em2
+```
+
+`bridge` is the name of your network bridge that the playbook will create.  `bridge_iface` is the interface which will be bridged to this.  The `bridge_iface` interface needs to be on the same network as your CC.  Please consult the Eucalyptus docuemtnation for more information: www.eucalyptus.com/docs.
+
+Next, you can go ahead and run your playbook: 
+```bash
+ansible-playbook -i dev-test-pilot-hosts site.yml
+```
+
+or simply:
+```bash
+ansible-playbook site.yml
+```
+if you already specified the `hostfile =` parameter in your ansible.cfg file, as describe above.
+
+Use the `-u` option to specify the username, `-k` if you want to pass a common SSH password (consider using key based auth) and `-s` for sudo and `-S` for passing the sudo password.
+
+

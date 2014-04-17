@@ -116,5 +116,3 @@
 - name: Download/install CentOS 6.4 image
   action: command eustore-install-image -i 3471904862 -b testbucket -k kvm
   when: image_present|failed
-
-
